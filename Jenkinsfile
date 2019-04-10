@@ -50,7 +50,7 @@ pipeline {
 	    
 	stage('current build status') {
 	    steps {
-		print "${currentBuild.result}"
+		print "${currentBuild.currentresult}"
 	    }
 	}
     
