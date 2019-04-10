@@ -1,0 +1,85 @@
+09/04/2019 22:06:45	This log contains information about the import schema operation into project 'Jenkins-Fa-Snapshot-Ci-Pipeline-Adv' on computer 'DESKTOP-JH5C5FM' by user 'cadkin'.
+09/04/2019 22:06:45	Import of database schema has started.
+09/04/2019 22:06:51	Gathering database credentials
+09/04/2019 22:06:51	Gathering database options
+09/04/2019 22:06:51	Gathering generic database scoped configuration option
+09/04/2019 22:06:51	Gathering users
+09/04/2019 22:06:51	Gathering roles
+09/04/2019 22:06:51	Gathering application roles
+09/04/2019 22:06:51	Gathering role memberships
+09/04/2019 22:06:51	Gathering filegroups
+09/04/2019 22:06:51	Gathering full-text catalogs
+09/04/2019 22:06:51	Gathering assemblies
+09/04/2019 22:06:51	Gathering certificates
+09/04/2019 22:06:51	Gathering asymmetric keys
+09/04/2019 22:06:51	Gathering symmetric keys
+09/04/2019 22:06:51	Gathering encrypted symmetric keys
+09/04/2019 22:06:51	Gathering schemas
+09/04/2019 22:06:51	Gathering XML schema collections
+09/04/2019 22:06:51	Gathering user-defined data types
+09/04/2019 22:06:51	Gathering user-defined types
+09/04/2019 22:06:51	Gathering table types
+09/04/2019 22:06:51	Gathering unique keys for table types
+09/04/2019 22:06:51	Gathering primary keys for table types
+09/04/2019 22:06:51	Gathering indexes for table types
+09/04/2019 22:06:51	Gathering check constraints for table types
+09/04/2019 22:06:51	Gathering default constraints for table types
+09/04/2019 22:06:51	Gathering partition functions
+09/04/2019 22:06:51	Gathering partition schemes
+09/04/2019 22:06:51	Gathering functions
+09/04/2019 22:06:51	Gathering encrypted functions
+09/04/2019 22:06:51	Gathering aggregates
+09/04/2019 22:06:51	Gathering procedures
+09/04/2019 22:06:51	Gathering encrypted procedures
+09/04/2019 22:06:51	Gathering tables
+09/04/2019 22:06:51	Gathering primary keys
+09/04/2019 22:06:51	Gathering unique constraints
+09/04/2019 22:06:51	Gathering foreign keys
+09/04/2019 22:06:51	Gathering default constraints
+09/04/2019 22:06:51	Gathering check constraints
+09/04/2019 22:06:51	Gathering views
+09/04/2019 22:06:51	Gathering encrypted views
+09/04/2019 22:06:51	Gathering indexes
+09/04/2019 22:06:51	Gathering statistics
+09/04/2019 22:06:51	Gathering full-text index stoplists
+09/04/2019 22:06:51	Gathering search property lists
+09/04/2019 22:06:51	Gathering search properties
+09/04/2019 22:06:51	Gathering full-text indexes
+09/04/2019 22:06:51	Gathering column store indexes
+09/04/2019 22:06:51	Gathering spatial indexes
+09/04/2019 22:06:51	Gathering XML indexes
+09/04/2019 22:06:51	Gathering Selective XML indexes
+09/04/2019 22:06:51	Gathering encrypted triggers
+09/04/2019 22:06:51	Gathering triggers
+09/04/2019 22:06:51	Gathering encrypted and clr ddl triggers
+09/04/2019 22:06:51	Gathering ddl triggers
+09/04/2019 22:06:51	Gathering synonyms
+09/04/2019 22:06:51	Gathering defaults
+09/04/2019 22:06:51	Gathering data constraint uddt bindings
+09/04/2019 22:06:51	Gathering rules
+09/04/2019 22:06:51	Gathering data constraint uddt bindings
+09/04/2019 22:06:51	Gathering message types
+09/04/2019 22:06:51	Gathering queues
+09/04/2019 22:06:51	Gathering contracts
+09/04/2019 22:06:51	Gathering services
+09/04/2019 22:06:51	Gathering event notifications
+09/04/2019 22:06:51	Gathering remote service bindings
+09/04/2019 22:06:51	Gathering broker priorities
+09/04/2019 22:06:51	Gathering signatures
+09/04/2019 22:06:51	Gathering data compression options
+09/04/2019 22:06:51	Gathering sequence types
+09/04/2019 22:06:51	Gathering security policies
+09/04/2019 22:06:51	Gather column encryption keys
+09/04/2019 22:06:51	Gathering column master keys
+09/04/2019 22:06:51	Gathering external data sources
+09/04/2019 22:06:51	Gathering external file formats
+09/04/2019 22:06:51	Gathering external tables
+09/04/2019 22:06:51	Gathering extended properties
+09/04/2019 22:06:51	Gathering credentials
+09/04/2019 22:06:51	Gathering logins
+09/04/2019 22:06:51	Gathering server audits
+09/04/2019 22:06:52	Scanning project for duplicate elements
+09/04/2019 22:06:52	Finished duplicate element processing
+09/04/2019 22:06:53	Finished importing database.
+09/04/2019 22:06:53	A summary of the import was saved to the following location: C:\Projects\Jenkins-Fa-Snapshot-Ci-Pipeline-Adv\Jenkins-Fa-Snapshot-Ci-Pipeline-Adv\Import Schema Logs\Jenkins-Fa-Snapshot-_20190409090645.log
+09/04/2019 22:06:53	Click Finish to continue...

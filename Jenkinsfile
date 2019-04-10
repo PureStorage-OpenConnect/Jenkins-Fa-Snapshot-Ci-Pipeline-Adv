@@ -1,0 +1,123 @@
+def RefreshDatabase(RefreshDatabase, SourceInstance, DestInstance, PfaEndpoint) {
+    timeout(time:5, unit:'MINUTES') {
+        withCredentials([string(credentialsId: 'PfaCredentialsFile', variable: 'PfaCredentialsFile'),
+                         string(credentialsId: 'PfaUser'           , variable: 'PfaUser')]) {
+            powershell 'Import-Module -Name PureStorageDbaTools; ' + 
+                       '\$Pwd = Get-Content ' + "${PfaCredentialsFile}" + ' | ConvertTo-SecureString;'  +
+                       '\$Creds = New-Object System.Management.Automation.PSCredential(\"' + "${PfaUser}" + '\",\$Pwd); ' +
+                       'Invoke-PfaDbRefresh -RefreshDatabase ' + "${RefreshDatabase}"       + 
+                                          ' -RefreshSource   ' + "${SourceInstance}" + 
+                                          ' -DestSqlInstance ' + "${DestInstance}"   + 
+                                          ' -PfaEndpoint     ' + "${PfaEndpoint}"    + 
+                                          ' -PfaCredentials  \$Creds'
+        }
+    }
+}
+
+def GetScmProjectName() {
+    def scmProjectName = scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.")[0]
+    return scmProjectName.trim()
+}
+
+pipeline {
+    agent any
+
+    environment {
+        SCM_PROJECT    = GetScmProjectName()
+    }
+    
+    parameters {
+        string(name: 'PFA_ENDPOINT'     , defaultValue: '10.225.112.10'              , description: 'Flash array end point')
+        string(name: 'REFRESH_DATABASE' , defaultValue: 'tpch-no-compression'        , description: 'Database that is refresh source/target')
+        string(name: 'PROD_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSPRD' , description: 'Database that is refresh source/target')
+        string(name: 'IAT_SQL_INSTANCE' , defaultValue: 'Z-STN-WIN2016-A\\DEVOPSIAT' , description: 'Database that is refresh source/target')
+        string(name: 'DEV1_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSDEV1', description: 'Database that is refresh source/target')
+        string(name: 'DEV2_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSDEV2', description: 'Database that is refresh source/target')
+        string(name: 'DEV3_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSDEV3', description: 'Database that is refresh source/target')
+        string(name: 'DEV4_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSDEV4', description: 'Database that is refresh source/target')
+        booleanParam(name: 'HAPPY_PATH' , defaultValue: true                         , description: 'Toggle to send tests down happy/unhappy path')
+    }
+    
+    stages {
+        stage('git checkout'){
+            timeout(time:1, unit:'MINUTES') {
+                checkout scm
+            }
+        }
+    
+        stage('Build Dacpac from SQLProj') {
+            timeout(time:5, unit:'MINUTES') {
+                bat "\"${tool name: 'Default', type: 'msbuild'}\" /p:Configuration=Release"
+                stash includes: 'Jenkins-Fa-Snapshot-Ci-Pipeline-Adv\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline-Adv.dacpac', name: 'theDacpac'
+            }
+        }        
+        
+        stage('refresh IAT from prod') {
+            RefreshDatabase("${params.REFRESH_DATABASE}", "${params.PROD_SQL_INSTANCE}", "${params.IAT_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+        }
+        
+        stage('Deploy Dacpac to SQL Server')
+        {
+            timeout(time:2, unit:'MINUTES') {
+                unstash 'theDacpac'
+                def ConnString = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
+                bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"Jenkins-Fa-Snapshot-Ci-Pipeline\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline.dacpac\" /TargetConnectionString:\"${ConnString}\""
+            }        
+        }        
+
+        stage('run tests (Happy path)') {
+            when {
+                expression {
+                    return params.HAPPY_PATH
+                }
+            }
+            steps {
+                bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -d ${params.REFRESH_DATABASE} -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
+                bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -d ${params.REFRESH_DATABASE} -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}.xml\"" 
+                junit "${SCM_PROJECT}.xml"
+            }
+        }
+
+        stage('run tests (Un-happy path)') {
+            when {
+                expression {
+                    return !(params.HAPPY_PATH)
+                }
+            }
+            steps {
+                bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -d ${params.REFRESH_DATABASE} -Q \"EXEC tSQLt.Run \'tSQLtUnHappyPath\'\""
+                bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -d ${params.REFRESH_DATABASE} -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}.xml\"" 
+                junit "${SCM_PROJECT}.xml"
+            }
+        }
+    }
+    post {
+        always {
+            print 'post: Always'
+        }
+        success {
+            print 'Build and test succeeded: refreshing development databases'
+
+	    parallel (
+                dev1: {
+		    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		},
+		dev2: {
+		    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV2_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		},
+		dev3: {
+		    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV3_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		},
+		dev4: {
+	            RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV4_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		}
+            )
+        }
+        unstable {
+            print 'post: Unstable'
+        }
+        failure {
+            print 'post: Failure'
+        }
+    }
+}
