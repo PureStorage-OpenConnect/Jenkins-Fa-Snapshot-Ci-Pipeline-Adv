@@ -19,7 +19,7 @@ def GetScmProjectName() {
     return scmProjectName.trim()
 }
 
-dev ParallelDevDbRefresh() {
+def ParallelDevDbRefresh() {
     parallel (
 	dev1: {
 	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
