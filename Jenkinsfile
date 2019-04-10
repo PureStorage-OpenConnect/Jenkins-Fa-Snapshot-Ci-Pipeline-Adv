@@ -73,6 +73,12 @@ pipeline {
 	    }
         }        
 
+	stage('current build status') {
+	    steps {
+		print "${currentbuild.currentresult}"
+	    }
+	}
+
         stage('run tests (Happy path)') {
             when {
                 expression {
@@ -99,12 +105,6 @@ pipeline {
             }
         }
 	    
-	stage('current build status') {
-	    steps {
-		print "${currentbuild.currentresult}"
-	    }
-	}
-
 	stage('BUILD IS STABLE => refresh dev databases') {
             when {
                 expression {
