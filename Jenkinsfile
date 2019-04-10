@@ -19,6 +19,23 @@ def GetScmProjectName() {
     return scmProjectName.trim()
 }
 
+dev ParallelDevDbRefresh() {
+    parallel (
+	dev1: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+	},
+	dev2: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV2_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+	},
+	dev3: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV3_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+	},
+	dev4: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV4_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+	}
+    )         
+}	
+
 pipeline {
     agent any
 
@@ -133,6 +150,7 @@ pipeline {
             print 'post: Always'
         }
         success {
+            ParallelDevDbRefresh()
             print 'post: Success'
         }
         unstable {
