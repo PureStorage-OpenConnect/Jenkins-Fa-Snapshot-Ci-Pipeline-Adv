@@ -70,7 +70,7 @@ pipeline {
 	    steps {
                 timeout(time:5, unit:'MINUTES') {
                     bat "\"${tool name: 'Default', type: 'msbuild'}\" /p:Configuration=Release"
-                    stash includes: 'Jenkins-Fa-Snapshot-Ci-Pipeline-Adv\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline-Adv.dacpac', name: 'theDacpac'
+                    stash includes: '${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac', name: 'theDacpac'
                 }
 	    }
         }        
@@ -148,7 +148,6 @@ pipeline {
     post {
         always {
             print 'post: Always'
-	    RefresfDevDatabase()
         }
         success {
             print 'post: Success'
