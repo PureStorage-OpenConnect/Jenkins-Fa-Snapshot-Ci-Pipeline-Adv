@@ -19,8 +19,21 @@ def GetScmProjectName() {
     return scmProjectName.trim()
 }
 
-def ChrisTest() {
-    print "chris test"
+def RefresfDevDatabase() {
+    parallel (
+        dev1: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+        },
+        dev2: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV2_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+        },
+        dev3: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV3_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+        },
+        dev4: {
+	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV4_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+        }
+    )            
 }
 
 pipeline {
@@ -132,10 +145,10 @@ pipeline {
     post {
         always {
             print 'post: Always'
-	    ChrisTest()
         }
         success {
             print 'post: Success'
+	    RefresfDevDatabase()
         }
         unstable {
             print 'post: Unstable'
