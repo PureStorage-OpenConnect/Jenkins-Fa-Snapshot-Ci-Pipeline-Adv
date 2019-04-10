@@ -98,28 +98,38 @@ pipeline {
                 junit "${SCM_PROJECT}.xml"
             }
         }
+
+	stage('BUILD IS STABLE => refresh dev databases') {
+            when {
+                expression {
+		    return (${currentbuild.currentresult} == "SUCCESS")
+                }
+            }
+            steps {
+		parallel (
+		    dev1: {
+			RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		    },
+		    dev2: {
+			RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV2_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		    },
+		    dev3: {
+			RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV3_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		    },
+		    dev4: {
+			RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV4_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+		    }
+		)            
+	    }
+        }
+
     }
     post {
         always {
             print 'post: Always'
         }
         success {
-            print 'Build and test succeeded: refreshing development databases'
-
-	    parallel (
-                dev1: {
-		    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-		},
-		dev2: {
-		    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV2_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-		},
-		dev3: {
-		    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV3_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-		},
-		dev4: {
-	            RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV4_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-		}
-            )
+            print 'post: Success'
         }
         unstable {
             print 'post: Unstable'
