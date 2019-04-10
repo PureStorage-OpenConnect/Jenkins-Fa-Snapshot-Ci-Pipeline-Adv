@@ -39,30 +39,38 @@ pipeline {
     }
     
     stages {
-        stage('git checkout'){
-            timeout(time:1, unit:'MINUTES') {
-                checkout scm
-            }
+        stage('git checkout') {
+	    steps {
+                timeout(time:1, unit:'MINUTES') {
+                    checkout scm
+                }
+	    }
         }
     
         stage('Build Dacpac from SQLProj') {
-            timeout(time:5, unit:'MINUTES') {
-                bat "\"${tool name: 'Default', type: 'msbuild'}\" /p:Configuration=Release"
-                stash includes: 'Jenkins-Fa-Snapshot-Ci-Pipeline-Adv\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline-Adv.dacpac', name: 'theDacpac'
-            }
+	    steps {
+                timeout(time:5, unit:'MINUTES') {
+                    bat "\"${tool name: 'Default', type: 'msbuild'}\" /p:Configuration=Release"
+                    stash includes: 'Jenkins-Fa-Snapshot-Ci-Pipeline-Adv\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline-Adv.dacpac', name: 'theDacpac'
+                }
+	    }
         }        
         
         stage('refresh IAT from prod') {
-            RefreshDatabase("${params.REFRESH_DATABASE}", "${params.PROD_SQL_INSTANCE}", "${params.IAT_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-        }
+	    steps {		   
+                RefreshDatabase("${params.REFRESH_DATABASE}", "${params.PROD_SQL_INSTANCE}", "${params.IAT_SQL_INSTANCE}", "${PFA_ENDPOINT}")
+	    }
+	}
         
         stage('Deploy Dacpac to SQL Server')
         {
-            timeout(time:2, unit:'MINUTES') {
-                unstash 'theDacpac'
-                def ConnString = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
-                bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"Jenkins-Fa-Snapshot-Ci-Pipeline\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline.dacpac\" /TargetConnectionString:\"${ConnString}\""
-            }        
+	    steps {
+                timeout(time:2, unit:'MINUTES') {
+                    unstash 'theDacpac'
+                    def ConnString = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
+                    bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"Jenkins-Fa-Snapshot-Ci-Pipeline\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline.dacpac\" /TargetConnectionString:\"${ConnString}\""
+		}        
+	    }
         }        
 
         stage('run tests (Happy path)') {
