@@ -106,7 +106,7 @@ pipeline {
 	stage('BUILD IS STABLE => refresh dev databases') {
             when {
                 expression {
-		    return (currentbuild.result == "")
+		    return (currentBuild.result.trim() != 'UNSTABLE')
                 }
             }
             steps {
