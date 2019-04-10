@@ -98,6 +98,12 @@ pipeline {
                 junit "${SCM_PROJECT}.xml"
             }
         }
+	    
+	stage('current build status') {
+	    steps {
+		print ${currentbuild.currentresult}
+	    }
+	}
 
 	stage('BUILD IS STABLE => refresh dev databases') {
             when {
