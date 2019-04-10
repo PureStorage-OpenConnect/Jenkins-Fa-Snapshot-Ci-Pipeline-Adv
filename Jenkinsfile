@@ -68,7 +68,7 @@ pipeline {
 	    steps {
                 timeout(time:2, unit:'MINUTES') {
                     unstash 'theDacpac'
-                    bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"Jenkins-Fa-Snapshot-Ci-Pipeline\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
+                    bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
 		}        
 	    }
         }        
