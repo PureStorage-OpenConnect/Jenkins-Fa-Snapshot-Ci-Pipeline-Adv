@@ -19,23 +19,6 @@ def GetScmProjectName() {
     return scmProjectName.trim()
 }
 
-def RefresfDevDatabase() {
-    parallel (
-        dev1: {
-	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV1_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-        },
-        dev2: {
-	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV2_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-        },
-        dev3: {
-	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV3_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-        },
-        dev4: {
-	    RefreshDatabase("${params.REFRESH_DATABASE}", "${params.IAT_SQL_INSTANCE}", "${params.DEV4_SQL_INSTANCE}", "${PFA_ENDPOINT}")
-        }
-    )            
-}
-
 pipeline {
     agent any
 
@@ -120,16 +103,10 @@ pipeline {
             }
         }
 	    
-	stage('build status') {
-	    steps {
-		print "${currentBuild.result}"
-	    }
-	}	    
-	    
 	stage('BUILD IS STABLE => refresh dev databases') {
             when {
                 expression {
-		    return (${currentbuild.currentresult} == "SUCCESS")
+		    return (${currentbuild.result} == "")
                 }
             }
             steps {
@@ -157,7 +134,6 @@ pipeline {
         }
         success {
             print 'post: Success'
-	    RefresfDevDatabase()
         }
         unstable {
             print 'post: Unstable'
