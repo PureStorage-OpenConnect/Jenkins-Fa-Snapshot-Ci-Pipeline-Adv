@@ -39,7 +39,7 @@ pipeline {
         booleanParam(name: 'HAPPY_PATH' , defaultValue: true                         , description: 'Toggle to send tests down happy/unhappy path')
     }
     
-    stages {
+    stages {	  
         stage('git checkout') {
 	    steps {
                 timeout(time:1, unit:'MINUTES') {
@@ -47,6 +47,12 @@ pipeline {
                 }
 	    }
         }
+	    
+	stage('current build status') {
+	    steps {
+		print "${currentbuild.currentresult}"
+	    }
+	}
     
         stage('Build Dacpac from SQLProj') {
 	    steps {
@@ -72,12 +78,6 @@ pipeline {
 		}        
 	    }
         }        
-
-	stage('current build status') {
-	    steps {
-		print "${currentbuild.currentresult}"
-	    }
-	}
 
         stage('run tests (Happy path)') {
             when {
