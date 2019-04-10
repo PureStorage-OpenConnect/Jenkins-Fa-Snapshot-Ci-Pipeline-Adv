@@ -70,7 +70,7 @@ pipeline {
 	    steps {
                 timeout(time:5, unit:'MINUTES') {
                     bat "\"${tool name: 'Default', type: 'msbuild'}\" /p:Configuration=Release"
-                    stash includes: '${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac', name: 'theDacpac'
+                    stash includes: '"${SCM_PROJECT}"\\bin\\Release\\"${SCM_PROJECT}".dacpac', name: 'theDacpac'
                 }
 	    }
         }        
