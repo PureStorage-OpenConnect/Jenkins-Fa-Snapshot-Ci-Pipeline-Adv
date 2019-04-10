@@ -23,7 +23,8 @@ pipeline {
     agent any
 
     environment {
-        SCM_PROJECT    = GetScmProjectName()
+        SCM_PROJECT        = GetScmProjectName()
+	IAT_CONNECT_STRING = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
     }
     
     parameters {
@@ -67,8 +68,7 @@ pipeline {
 	    steps {
                 timeout(time:2, unit:'MINUTES') {
                     unstash 'theDacpac'
-                    def ConnString = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
-                    bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"Jenkins-Fa-Snapshot-Ci-Pipeline\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline.dacpac\" /TargetConnectionString:\"${ConnString}\""
+                    bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"Jenkins-Fa-Snapshot-Ci-Pipeline\\bin\\Release\\Jenkins-Fa-Snapshot-Ci-Pipeline.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
 		}        
 	    }
         }        
