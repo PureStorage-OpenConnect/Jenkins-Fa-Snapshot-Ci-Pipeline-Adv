@@ -19,12 +19,17 @@ def GetScmProjectName() {
     return scmProjectName.trim()
 }
 
+def ChrisTest() {
+    print "chris test"
+}
+
 pipeline {
     agent any
 
     environment {
         SCM_PROJECT        = GetScmProjectName()
 	IAT_CONNECT_STRING = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
+	SQLPACKAGE_EXE     = "C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe"
     }
     
     parameters {
@@ -47,13 +52,7 @@ pipeline {
                 }
 	    }
         }
-	    
-	stage('current build status') {
-	    steps {
-		print "${currentBuild.currentresult}"
-	    }
-	}
-    
+	        
         stage('Build Dacpac from SQLProj') {
 	    steps {
                 timeout(time:5, unit:'MINUTES') {
@@ -74,7 +73,7 @@ pipeline {
 	    steps {
                 timeout(time:2, unit:'MINUTES') {
                     unstash 'theDacpac'
-                    bat "\"C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe\" /Action:Publish /SourceFile:\"${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
+		    bat "\"${SQLPACKAGE_EXE}\" /Action:Publish /SourceFile:\"${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
 		}        
 	    }
         }        
@@ -133,6 +132,7 @@ pipeline {
     post {
         always {
             print 'post: Always'
+	    ChrisTest()
         }
         success {
             print 'post: Success'
