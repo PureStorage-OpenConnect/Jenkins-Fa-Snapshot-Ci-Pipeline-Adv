@@ -85,7 +85,10 @@ pipeline {
         {
 	    steps {
                 timeout(time:2, unit:'MINUTES') {
-                    unstash 'theDacpac'
+                    unstash 'theDacpac'			
+		    bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -Q \"EXEC sp_configure 'show advanced option', '1';RECONFIGURE\""
+                    bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -Q \"EXEC sp_configure 'clr enabled', 1;RECONFIGURE\""
+                    bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -Q \"EXEC sp_configure 'clr strict security', 0;RECONFIGURE\""			
 		    bat "\"${SQLPACKAGE_EXE}\" /Action:Publish /SourceFile:\"${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
 		}        
 	    }
