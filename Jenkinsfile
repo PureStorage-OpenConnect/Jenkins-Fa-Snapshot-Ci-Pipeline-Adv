@@ -145,6 +145,7 @@ pipeline {
     post {
         always {
             print 'post: Always'
+	    RefresfDevDatabase()
         }
         success {
             print 'post: Success'
