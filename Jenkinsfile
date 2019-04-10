@@ -120,6 +120,12 @@ pipeline {
             }
         }
 	    
+	stage('build status') {
+	    steps {
+		print "${currentBuild.result}"
+	    }
+	}	    
+	    
 	stage('BUILD IS STABLE => refresh dev databases') {
             when {
                 expression {
