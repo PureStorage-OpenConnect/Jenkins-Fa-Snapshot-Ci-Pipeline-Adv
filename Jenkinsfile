@@ -42,7 +42,6 @@ pipeline {
     environment {
         SCM_PROJECT        = GetScmProjectName()
 	IAT_CONNECT_STRING = "server=${params.IAT_SQL_INSTANCE};database=${params.REFRESH_DATABASE}"
-	SQLPACKAGE_EXE     = "C:\\Program Files (x86)\\Microsoft SQL Server\\140\\DAC\\bin\\sqlpackage.exe"
     }
     
     parameters {
@@ -55,6 +54,7 @@ pipeline {
         string(name: 'DEV3_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSDEV3', description: 'Database that is refresh source/target')
         string(name: 'DEV4_SQL_INSTANCE', defaultValue: 'Z-STN-WIN2016-A\\DEVOPSDEV4', description: 'Database that is refresh source/target')
         booleanParam(name: 'HAPPY_PATH' , defaultValue: true                         , description: 'Toggle to send tests down happy/unhappy path')
+        string(name: 'SqlPackagePath'   , defaultValue: 'C:\\SSDTTools\\Microsoft.Data.Tools.Msbuild\\lib\\net46\\sqlpackage.exe')  
     }
     
     stages {	  
@@ -89,7 +89,7 @@ pipeline {
 		    bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -Q \"EXEC sp_configure 'show advanced option', '1';RECONFIGURE\""
                     bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -Q \"EXEC sp_configure 'clr enabled', 1;RECONFIGURE\""
                     bat "sqlcmd -S ${params.IAT_SQL_INSTANCE} -Q \"EXEC sp_configure 'clr strict security', 0;RECONFIGURE\""			
-		    bat "\"${SQLPACKAGE_EXE}\" /Action:Publish /SourceFile:\"${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
+		    bat "\"${params.SqlPackagePath}\" /Action:Publish /SourceFile:\"${SCM_PROJECT}\\bin\\Release\\${SCM_PROJECT}.dacpac\" /TargetConnectionString:\"${IAT_CONNECT_STRING}\""
 		}        
 	    }
         }        
